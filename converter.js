@@ -1,0 +1,10 @@
+const fs = require("fs")
+line = fs.readFileSync("weight1").toString().split("\n")
+line = line.slice(1)
+line = line.map(l => l.replace(/,/g, "\t"))
+fs.writeFileSync("weight1.in", line.join("\n"))
+
+line = fs.readFileSync("weight2").toString().split("\n")
+line = line.slice(1)
+line = line.map(l => l.replace(/,/g, "\t"))
+fs.writeFileSync("weight2.in", line.join("\n"))
