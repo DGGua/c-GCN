@@ -1,16 +1,19 @@
 #include <iostream>
+#include "compute.h"
 #include "utils.h"
 using namespace std;
 // #define NODE_CNT 1
-#define NODE_CNT 2708
-#define FEATURE_LENGTH 1433
-#define HIDDEN_SIZE 16
-#define OUTPUT 7
-#define NODE_PATH "cora/test.content"
-#define EDGE_PATH "cora/cora.cites"
+#define NODE_CNT 5
+#define FEATURE_LENGTH 4
+#define HIDDEN_SIZE 3
+#define OUTPUT 2
+#define ADJ_PATH "input_output/adj.csv"
+#define FEATURE_PATH "input_output/nodes.csv"
+#define WEIGHT1_PATH "input_output/weight1.csv"
+#define WEIGHT2_PATH "input_output/weight2.csv"
 
 int main() {
-  float* feature_map =
+  float* feature_list =
       (float*)malloc(NODE_CNT * FEATURE_LENGTH * sizeof(float));
   float* adj_matrix = (float*)malloc(NODE_CNT * NODE_CNT * sizeof(float));
   float* weight1 = (float*)malloc(FEATURE_LENGTH * HIDDEN_SIZE * sizeof(float));
@@ -19,43 +22,22 @@ int main() {
   float* output = (float*)malloc(NODE_CNT * OUTPUT * sizeof(float));
   float* buf = (float*)malloc(NODE_CNT * FEATURE_LENGTH * sizeof(float));
 
-  // map<int, int> id_map;
-  // get_feature_and_map_node_id(NODE_PATH, id_map, feature_map,
-  // FEATURE_LENGTH,
-  //                             NODE_CNT);
+  load(ADJ_PATH, adj_matrix, NODE_CNT * NODE_CNT);
+  load(FEATURE_PATH, feature_list, NODE_CNT * FEATURE_LENGTH);
+  load(WEIGHT1_PATH, weight1, FEATURE_LENGTH * HIDDEN_SIZE);
+  load(WEIGHT2_PATH, weight2, HIDDEN_SIZE * OUTPUT);
 
-  // generate_adj_matrix(EDGE_PATH, id_map, adj_matrix, NODE_CNT);
-  // for (int i = 0; i < NODE_CNT; i++) {
-  //   for (int j = 0; j < NODE_CNT; j++) {
-  //     cout << (adj_matrix[i * NODE_CNT + j] ? "1" : "0");
-  //     if (j < NODE_CNT - 1) {
-  //       cout << "\t";
-  //     }
-  //   }
-  //   cout << endl;
-  //  }
-  load("test.in", buf, 1);
-  cout << buf[0] << "1" << endl;
-  // load("adj.in", adj_matrix, NODE_CNT * NODE_CNT);
-  // load("feat.in", feature_map, NODE_CNT * FEATURE_LENGTH);
-  // load("weight1.in", weight1, FEATURE_LENGTH * HIDDEN_SIZE);
-  // load("weight2.in", weight2, HIDDEN_SIZE * OUTPUT);
+  cout << "load done" << endl;
 
-  // cout << "load done" << endl;
+  mm(feature_list, weight1, FEATURE_LENGTH, HIDDEN_SIZE, NODE_CNT,
+     FEATURE_LENGTH, buf);
 
-  // mm(feature_map, weight1, FEATURE_LENGTH, HIDDEN_SIZE, NODE_CNT,
-  //    FEATURE_LENGTH, buf);
-
-  // output_matrix(buf, HIDDEN_SIZE, 1);
-  // mm(adj_matrix, buf, NODE_CNT, HIDDEN_SIZE, NODE_CNT, NODE_CNT, midoutput);
-  // relu(midoutput, HIDDEN_SIZE * NODE_CNT);
-  // output_matrix(midoutput, HIDDEN_SIZE, 1);
-  // mm(midoutput, weight2, HIDDEN_SIZE, OUTPUT, NODE_CNT, HIDDEN_SIZE, buf);
-  // output_matrix(buf, OUTPUT, 1);
-  // mm(adj_matrix, buf, NODE_CNT, OUTPUT, NODE_CNT, NODE_CNT, output);
-  // output_matrix(output, OUTPUT, 1);
-  // for (int i = 0; i < NODE_CNT; i++) {
-  //   softmax(output + i * OUTPUT, OUTPUT, buf);
-  // }
-  // output_matrix(output, OUTPUT, NODE_CNT);
+  mm(adj_matrix, buf, NODE_CNT, HIDDEN_SIZE, NODE_CNT, NODE_CNT, midoutput);
+  relu(midoutput, HIDDEN_SIZE * NODE_CNT);
+  mm(midoutput, weight2, HIDDEN_SIZE, OUTPUT, NODE_CNT, HIDDEN_SIZE, buf);
+  mm(adj_matrix, buf, NODE_CNT, OUTPUT, NODE_CNT, NODE_CNT, output);
+  for (int i = 0; i < NODE_CNT; i++) {
+    softmax(output + i * OUTPUT, OUTPUT, buf);
+  }
+  output_matrix_log(output, OUTPUT, NODE_CNT);
 }

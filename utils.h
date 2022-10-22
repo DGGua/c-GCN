@@ -13,18 +13,8 @@ int get_feature_and_map_node_id(string node_path,
                                 int featrue_len,
                                 int node_len);
 
-int mm(float* A,
-       float* B,
-       int widA,
-       int widB,
-       int heightA,
-       int heightB,
-       float* res);
-
-int relu(float* M, int length);
-
-int softmax(float* V, int length, void* buf);
-
 int load(string filename, float* arr, int length);
 
 int output_matrix(float* matrix, int width, int height);
+
+int output_matrix_log(float* matrix, int width, int height);

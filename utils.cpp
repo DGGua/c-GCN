@@ -54,49 +54,6 @@ int get_feature_and_map_node_id(string node_path,
   return 0;
 }
 
-int mm(float* A,
-       float* B,
-       int widA,
-       int widB,
-       int heightA,
-       int heightB,
-       float* res) {
-  if (widA != heightB) {
-    cerr << "cannot do matrix multiply" << endl;
-    return 1;
-  }
-  for (int i = 0; i < heightA; i++) {
-    for (int j = 0; j < widB; j++) {
-      float buf = 0;
-      for (int k = 0; k < widA; k++) {
-        buf += A[i * widA + k] * B[k * widB + j];
-      }
-      res[i * widB + j] = buf;
-    }
-  }
-  return 0;
-}
-
-int relu(float* M, int length) {
-  for (int i = 0; i < length; i++) {
-    M[i] = M[i] < 0 ? 0 : M[i];
-  }
-  return 0;
-}
-
-int softmax(float* V, int length, void* buf) {
-  long double sum = 0;
-  long double* bufp = (long double*)buf;
-  for (int i = 0; i < length; i++) {
-    bufp[i] = exp((long double)V[i]);
-    sum += bufp[i];
-  }
-  for (int i = 0; i < length; i++) {
-    V[i] = (float)(bufp[i] / sum);
-  }
-  return 0;
-}
-
 int load(string filename, float* arr, int length) {
   ifstream fin;
   fin.open(filename, ios::in);
@@ -114,6 +71,19 @@ int load(string filename, float* arr, int length) {
 int output_matrix(float* matrix, int width, int height) {
   for (int i = 0; i < height; i++) {
     for (int j = 0; j < width; j++) {
+      cout << matrix[i * width + j];
+      if (j < width - 1) {
+        cout << "\t";
+      }
+    }
+    cout << endl;
+  }
+  cout << endl;
+}
+
+int output_matrix_log(float* matrix, int width, int height) {
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
       cout << log(matrix[i * width + j]);
       if (j < width - 1) {
         cout << "\t";
@@ -121,4 +91,5 @@ int output_matrix(float* matrix, int width, int height) {
     }
     cout << endl;
   }
+  cout << endl;
 }
